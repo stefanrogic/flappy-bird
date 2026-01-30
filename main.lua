@@ -1,12 +1,25 @@
-Class = require 'class'
-push = require 'push'
-require 'settings'
+Class = require 'lib/class'
+push = require 'lib/push'
+require 'Bird'
+
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
+
+-- Scrolling variables
+local backgroundScroll = 0
+BACKGROUND_SCROLL_SPEED = 30
+BACKGROUND_LOOPING_POINT = 568
+
+local groundScroll = 0
+GROUND_SCROLL_SPEED = 60
+GROUND_LOOPING_POINT = 514
+
+-- Classes
+local bird = Bird()
 
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -21,27 +34,19 @@ function love.load()
     }
 
     images = {
-        ['bird'] = love.graphics.newImage('sprites/bird.png'),
-        ['pipe'] = love.graphics.newImage('sprites/pipe.png'),
         ['background'] = love.graphics.newImage('sprites/background.png'),
         ['ground'] = love.graphics.newImage('sprites/ground.png')
     }
 
-    -- Scrolling variables
-    local backgroundScroll = 0
-    local BACKGROUND_SCROLL_SPEED = 30
-    local BACKGROUND_LOOPING_POINT = 568
-
-    local groundScroll = 0
-    local GROUND_SCROLL_SPEED = 60
-    local GROUND_LOOPING_POINT = 514
-    
     -- Setting up virtual resolution
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         vsync = true,
         fullscreen = true,
         resizable = true
     })
+
+    -- Init classes
+    bird:init()
 
     -- FPS toggle
     local fps = false;
@@ -53,6 +58,8 @@ function love.update(dt)
     -- This creates a seamless scrolling effect by cycling the background texture continuously.
     backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
     groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
+
+    bird:update(dt)
 end
 
 function love.draw()
@@ -60,6 +67,9 @@ function love.draw()
     push:start()
         love.graphics.draw(images['background'], -backgroundScroll, 0)
         love.graphics.draw(images['ground'], -groundScroll, VIRTUAL_HEIGHT - images['ground']:getHeight())
+
+        -- Render
+        bird:render()
 
         if fps then
             showFps()
