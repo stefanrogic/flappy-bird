@@ -1,5 +1,6 @@
 Class = require 'lib/class'
 push = require 'lib/push'
+require 'functions'
 require 'Bird'
 
 
@@ -38,12 +39,19 @@ function love.load()
         ['ground'] = love.graphics.newImage('sprites/ground.png')
     }
 
+    sounds = {
+        ['jump'] = love.audio.newSource('sounds/jump.wav', 'static')
+    }
+
     -- Setting up virtual resolution
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         vsync = true,
         fullscreen = true,
         resizable = true
     })
+
+    -- Input table (we need it for our own input handling)
+    love.keyboard.keysPressed = {}
 
     -- Init classes
     bird:init()
@@ -60,11 +68,11 @@ function love.update(dt)
     groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
 
     bird:update(dt)
+    love.keyboard.keysPressed = {} -- Reset keys pressed table each frame (so the bird doesnt fly away :D)
 end
 
 function love.draw()
-    -- Using push to handle virtual resolution (pixel art style)
-    push:start()
+    push:start()  -- Using push to handle virtual resolution (pixel art style)
         love.graphics.draw(images['background'], -backgroundScroll, 0)
         love.graphics.draw(images['ground'], -groundScroll, VIRTUAL_HEIGHT - images['ground']:getHeight())
 
@@ -77,18 +85,9 @@ function love.draw()
     push:finish()
 end
 
-function love.resize(w, h)
-    push:resize(w, h)
-end
-
-function showFps()
-    love.graphics.setFont(fonts['small'])
-    love.graphics.setColor(0, 1, 0, 1)
-    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
-    love.graphics.setColor(1, 1, 1, 1)
-end
-
 function love.keypressed(key)
+    love.keyboard.keysPressed[key] = true -- Add the key to table of keys pressed this frame
+
     if key == "escape" then
         love.event.quit()
     end
