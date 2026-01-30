@@ -1,29 +1,25 @@
 Class = require 'class'
 push = require 'push'
 
+require 'settings'
+
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
 
-local birdImage = love.graphics.newImage('sprites/bird.png')
-local pipeImage = love.graphics.newImage('sprites/pipe.png')
-
-local backgroundImage = love.graphics.newImage('sprites/background.png')
-local backgroundScroll = 0
-local BACKGROUND_SCROLL_SPEED = 30
-local BACKGROUND_LOOPING_POINT = 568
-
-local groundImage = love.graphics.newImage('sprites/ground.png')
-local groundScroll = 0
-local GROUND_SCROLL_SPEED = 60
-local GROUND_LOOPING_POINT = 514
-
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
     love.window.setTitle("Flappy Bird")
     love.window.setIcon(love.image.newImageData('sprites/bird.png'))
+
+    fonts = {
+        ['small'] = love.graphics.newFont('fonts/font.ttf', 8),
+        ['medium'] = love.graphics.newFont('fonts/font.ttf', 14),
+        ['large'] = love.graphics.newFont('fonts/font.ttf', 28),
+        ['flappy'] = love.graphics.newFont('fonts/flappy.ttf', 56)
+    }
     
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         vsync = true,
@@ -41,10 +37,14 @@ function love.update(dt)
 end
 
 function love.draw()
-    -- Using push to handle virtual resolution (making it look pixelated)
+    -- Using push to handle virtual resolution (pixel art style)
     push:start()
         love.graphics.draw(backgroundImage, -backgroundScroll, 0)
         love.graphics.draw(groundImage, -groundScroll, VIRTUAL_HEIGHT - groundImage:getHeight())
+
+        if fps then
+            showFps()
+        end
     push:finish()
 end
 
@@ -52,8 +52,19 @@ function love.resize(w, h)
     push:resize(w, h)
 end
 
+function showFps()
+    love.graphics.setFont(fonts['small'])
+    love.graphics.setColor(0, 1, 0, 1)
+    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
+    love.graphics.setColor(1, 1, 1, 1)
+end
+
 function love.keypressed(key)
     if key == "escape" then
         love.event.quit()
+    end
+
+    if key == "`" then
+        fps = not fps
     end
 end
