@@ -2,6 +2,7 @@ Class = require 'lib/class'
 push = require 'lib/push'
 require 'functions'
 require 'Bird'
+require 'Pipe'
 
 -- Window constants
 WINDOW_WIDTH = 1280
@@ -10,7 +11,7 @@ WINDOW_HEIGHT = 720
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
 
--- Scrolling variables
+-- Scrolling
 local backgroundScroll = 0
 BACKGROUND_SCROLL_SPEED = 30
 BACKGROUND_LOOPING_POINT = 568
@@ -19,13 +20,22 @@ local groundScroll = 0
 GROUND_SCROLL_SPEED = 60
 GROUND_LOOPING_POINT = 514
 
+-- Pipe spawning
+local pipes = {}
+local spawnTimer = 0
+local pipeDistance = 5 -- seconds
+
 -- Classes
 local bird
+local pipe
 
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
     love.window.setTitle("Flappy Bird")
     love.window.setIcon(love.image.newImageData('sprites/bird.png'))
+
+    -- Seed 
+    math.randomseed(os.time())
 
     fonts = {
         ['small'] = love.graphics.newFont('fonts/font.ttf', 8),
@@ -59,8 +69,9 @@ function love.load()
     -- Input table (we need it for our own input handling)
     love.keyboard.keysPressed = {}
 
-    -- Init classes
+    -- Init objects
     bird = Bird(images['bird'], sounds['jump'])
+    pipe = Pipe(images['pipe'])
 
     -- FPS toggle
     local fps = false;
@@ -73,7 +84,20 @@ function love.update(dt)
     backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
     groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
 
+    -- Updates
     bird:update(dt)
+
+    spawnTimer = spawnTimer + dt
+    if spawnTimer > pipeDistance then -- Add pipes to table
+        table.insert(pipes, Pipe(images['pipe']))
+        spawnTimer = 0
+    end
+    
+    for k, pipe in pairs(pipes) do -- Update every pipe positions
+        pipe:update(dt)
+    end
+
+    -- Resets
     love.keyboard.keysPressed = {} -- Reset keys pressed table each frame (so the bird doesnt fly away :D)
 end
 
@@ -85,6 +109,11 @@ function love.draw()
         -- Render
         bird:render()
 
+        for k, pipe in pairs(pipes) do -- Render every pipe in table
+            pipe:render()
+        end
+
+        -- Show FPS
         if fps then
             showFps()
         end
@@ -101,4 +130,16 @@ function love.keypressed(key)
     if key == "`" then
         fps = not fps
     end
+end
+
+function love.keyboard.wasPressed(key)
+    if love.keyboard.keysPressed[key] then
+        return true
+    else
+        return false
+    end 
+end
+
+function love.resize(w, h)
+    push:resize(w, h)
 end
