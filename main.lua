@@ -2,15 +2,23 @@ Class = require 'class'
 push = require 'push'
 
 WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 720
+WINDOW_HEIGHT = 715 -- instead of 720 because of visual bug with push library
 
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
 
 local birdImage = love.graphics.newImage('sprites/bird.png')
 local pipeImage = love.graphics.newImage('sprites/pipe.png')
+
 local backgroundImage = love.graphics.newImage('sprites/background.png')
+local backgroundScroll = 0
+local BACKGROUND_SCROLL_SPEED = 30
+local BACKGROUND_LOOPING_POINT = 568
+
 local groundImage = love.graphics.newImage('sprites/ground.png')
+local groundScroll = 0
+local GROUND_SCROLL_SPEED = 60
+local GROUND_LOOPING_POINT = 514
 
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -20,20 +28,23 @@ function love.load()
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         vsync = true,
         fullscreen = false,
-        resizable = false
+        resizable = true
     })
 end
 
 function love.update(dt)
-    -- Update game logic here
-    -- dt is the time elapsed since the last frame
+    -- Updates the background scroll position by incrementing it with a speed value scaled by delta time,
+    -- then wraps the scroll position back to the start using modulo operator when it exceeds the looping point.
+    -- This creates a seamless scrolling effect by cycling the background texture continuously.
+    backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
+    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
 end
 
 function love.draw()
     -- Using push to handle virtual resolution (making it look pixelated)
     push:start()
-        love.graphics.draw(backgroundImage, 0, 0)
-        love.graphics.draw(groundImage, 0, VIRTUAL_HEIGHT - groundImage:getHeight())
+        love.graphics.draw(backgroundImage, -backgroundScroll, 0)
+        love.graphics.draw(groundImage, -groundScroll, VIRTUAL_HEIGHT - groundImage:getHeight())
     push:finish()
 end
 
