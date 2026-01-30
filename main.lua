@@ -2,7 +2,7 @@ Class = require 'class'
 push = require 'push'
 
 WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 715 -- instead of 720 because of visual bug with push library
+WINDOW_HEIGHT = 720
 
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
@@ -27,7 +27,7 @@ function love.load()
     
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         vsync = true,
-        fullscreen = false,
+        fullscreen = true,
         resizable = true
     })
 end
