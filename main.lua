@@ -30,11 +30,18 @@ function love.update(dt)
 end
 
 function love.draw()
-    -- Draw everything here
+    -- Using push to handle virtual resolution (making it look pixelated)
+    push:start()
+        love.graphics.draw(backgroundImage, 0, 0)
+        love.graphics.draw(groundImage, 0, VIRTUAL_HEIGHT - groundImage:getHeight())
+    push:finish()
+end
+
+function love.resize(w, h)
+    push:resize(w, h)
 end
 
 function love.keypressed(key)
-    -- Handle key presses
     if key == "escape" then
         love.event.quit()
     end
