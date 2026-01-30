@@ -3,7 +3,7 @@ push = require 'lib/push'
 require 'functions'
 require 'Bird'
 
-
+-- Window constants
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
@@ -20,7 +20,7 @@ GROUND_SCROLL_SPEED = 60
 GROUND_LOOPING_POINT = 514
 
 -- Classes
-local bird = Bird()
+local bird
 
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -35,12 +35,18 @@ function love.load()
     }
 
     images = {
+        ['bird'] = love.graphics.newImage('sprites/bird.png'),
+        ['pipe'] = love.graphics.newImage('sprites/pipe.png'),
         ['background'] = love.graphics.newImage('sprites/background.png'),
         ['ground'] = love.graphics.newImage('sprites/ground.png')
     }
 
     sounds = {
-        ['jump'] = love.audio.newSource('sounds/jump.wav', 'static')
+        ['jump'] = love.audio.newSource('sounds/jump.wav', 'static'),
+        ['hurt'] = love.audio.newSource('sounds/hurt.wav', 'static'),   
+        ['explosion'] = love.audio.newSource('sounds/explosion.wav', 'static'),
+        ['score'] = love.audio.newSource('sounds/score.wav', 'static')
+
     }
 
     -- Setting up virtual resolution
@@ -54,7 +60,7 @@ function love.load()
     love.keyboard.keysPressed = {}
 
     -- Init classes
-    bird:init()
+    bird = Bird(images['bird'], sounds['jump'])
 
     -- FPS toggle
     local fps = false;
