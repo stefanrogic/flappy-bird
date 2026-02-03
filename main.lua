@@ -3,6 +3,7 @@ push = require 'lib/push'
 require 'functions'
 require 'Bird'
 require 'Pipe'
+require 'PipePair'
 
 -- Window constants
 WINDOW_WIDTH = 1280
@@ -22,12 +23,15 @@ GROUND_LOOPING_POINT = 514
 
 -- Pipe spawning
 local pipes = {}
+local pipePairs = {}
 local spawnTimer = 0
 local pipeDistance = 5 -- seconds
+local lastY = -PIPE_HEIGHT + math.random(80) + 20 
 
 -- Classes
 local bird
 local pipe
+local pipePair
 
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -72,6 +76,7 @@ function love.load()
     -- Init objects
     bird = Bird(images['bird'], sounds['jump'])
     pipe = Pipe(images['pipe'])
+    pipePair = PipePair(-PIPE_HEIGHT + math.random(80) + 20)
 
     -- FPS toggle
     local fps = false;
@@ -88,13 +93,19 @@ function love.update(dt)
     bird:update(dt)
 
     spawnTimer = spawnTimer + dt
-    if spawnTimer > pipeDistance then -- Add pipes to table
-        table.insert(pipes, Pipe(images['pipe']))
+    if spawnTimer > pipeDistance then
+        local y = math.max(-PIPE_HEIGHT + 50, 
+            math.min(lastY + math.random(-80, 80), VIRTUAL_HEIGHT - 50 - PIPE_HEIGHT)
+        )
+
+        lastY = y
+
+        table.insert(pipePairs, PipePair(y))
         spawnTimer = 0
     end
     
-    for k, pipe in pairs(pipes) do -- Update every pipe positions
-        pipe:update(dt)
+    for k, pair in pairs(pipePairs) do -- Update every pipe pair positions
+        pair:update(dt)
     end
 
     -- Resets
@@ -106,11 +117,18 @@ function love.draw()
         love.graphics.draw(images['background'], -backgroundScroll, 0)
         love.graphics.draw(images['ground'], -groundScroll, VIRTUAL_HEIGHT - images['ground']:getHeight())
 
+        -- Remove pipes that have gone off screen
+        for k, pair in pairs(pipePairs) do
+            if pair.remove then
+                table.remove(pipePairs, k)
+            end
+        end
+
         -- Render
         bird:render()
 
-        for k, pipe in pairs(pipes) do -- Render every pipe in table
-            pipe:render()
+        for k, pair in pairs(pipePairs) do -- Render every pipe in table
+            pair:render()
         end
 
         -- Show FPS

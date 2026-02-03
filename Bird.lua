@@ -5,7 +5,7 @@ local GRAVITY = 20
 function Bird:init(img, sound)
     self.image = img
     self.sound = sound
-    self.sound:setVolume(0.2)
+    self.sound:setVolume(0.1)
 
     self.width = self.image:getWidth()
     self.height = self.image:getHeight()
@@ -24,7 +24,7 @@ function Bird:update(dt)
     self.dy = self.dy + GRAVITY * dt
 
     if love.keyboard.wasPressed('space') then
-        self.dy = -5
+        self.dy = -3
 
         self.sound:play()
     end
