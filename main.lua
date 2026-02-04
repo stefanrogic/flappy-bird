@@ -5,6 +5,13 @@ require 'Bird'
 require 'Pipe'
 require 'PipePair'
 
+-- State
+require 'StateMachine'
+require 'states/BaseState'
+require 'states/TitleScreenState'
+require 'states/PlayState'
+require 'states/ScoreState'
+
 -- Window constants
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -13,8 +20,6 @@ VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
 
 -- Scrolling
-local scrolling = true -- We need to pause scrolling to check colision
-
 local backgroundScroll = 0
 BACKGROUND_SCROLL_SPEED = 30
 BACKGROUND_LOOPING_POINT = 568
@@ -22,18 +27,6 @@ BACKGROUND_LOOPING_POINT = 568
 local groundScroll = 0
 GROUND_SCROLL_SPEED = 60
 GROUND_LOOPING_POINT = 514
-
--- Pipe spawning
-local pipes = {}
-local pipePairs = {}
-local spawnTimer = 0
-local pipeDistance = 5 -- seconds
-local lastY = -PIPE_HEIGHT + math.random(80) + 20 
-
--- Classes
-local bird
--- local pipe
-local pipePair
 
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -49,6 +42,7 @@ function love.load()
         ['large'] = love.graphics.newFont('fonts/font.ttf', 28),
         ['flappy'] = love.graphics.newFont('fonts/flappy.ttf', 56)
     }
+    love.graphics.setFont(fonts['flappy'])
 
     images = {
         ['bird'] = love.graphics.newImage('sprites/bird.png'),
@@ -72,56 +66,32 @@ function love.load()
         resizable = true
     })
 
+    --- Initialize state machine with all state-returning functions
+    gStateMachine = StateMachine {
+        ['title'] = function() return TitleScreenState() end,
+        ['play'] = function() return PlayState() end,
+        ['score'] = function() return ScoreState() end
+    }
+    gStateMachine:change('title')
+
     -- Input table (we need it for our own input handling)
     love.keyboard.keysPressed = {}
 
-    -- Init objects
-    bird = Bird(images['bird'], sounds['jump'])
-    -- pipe = Pipe(images['pipe'])
-    pipePair = PipePair(-PIPE_HEIGHT + math.random(80) + 20)
-
     -- FPS toggle
-    local fps = false;
+    fps = false
 end
 
 function love.update(dt)
-    if scrolling then
-        -- Updates the background scroll position by incrementing it with a speed value scaled by delta time,
-        -- then wraps the scroll position back to the start using modulo operator when it exceeds the looping point.
-        -- This creates a seamless scrolling effect by cycling the background texture continuously.
-        backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
-        groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
+    -- Updates the background scroll position by incrementing it with a speed value scaled by delta time,
+    -- then wraps the scroll position back to the start using modulo operator when it exceeds the looping point.
+    -- This creates a seamless scrolling effect by cycling the background texture continuously.
+    backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
+    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
 
-        -- Updates
-        bird:update(dt)
-
-        spawnTimer = spawnTimer + dt
-        if spawnTimer > pipeDistance then
-            local y = math.max(-PIPE_HEIGHT + 50, 
-                math.min(lastY + math.random(-80, 80), VIRTUAL_HEIGHT - 50 - PIPE_HEIGHT)
-            )
-
-            lastY = y
-
-            table.insert(pipePairs, PipePair(y))
-            spawnTimer = 0
-        end
-        
-        for k, pair in pairs(pipePairs) do -- Update every pipe pair positions
-            pair:update(dt)
-
-            for l, pipe in pairs(pair.pipes) do -- Check collision for every pipe in pair
-                if bird:collides(pipe) then
-                    sounds['explosion']:setVolume(0.2)
-                    sounds['explosion']:play()
-                    scrolling = false -- Pause the game to show collision
-                end
-            end
-        end    
-    end
+    gStateMachine:update(dt)
 
     -- Resets
-    love.keyboard.keysPressed = {} -- Reset keys pressed table each frame (so the bird doesnt fly away :D)
+    love.keyboard.keysPressed = {} -- Reset keys pressed table each frame
 end
 
 function love.draw()
@@ -129,19 +99,7 @@ function love.draw()
         love.graphics.draw(images['background'], -backgroundScroll, 0)
         love.graphics.draw(images['ground'], -groundScroll, VIRTUAL_HEIGHT - images['ground']:getHeight())
 
-        -- Remove pipes that have gone off screen
-        for k, pair in pairs(pipePairs) do
-            if pair.remove then
-                table.remove(pipePairs, k)
-            end
-        end
-
-        -- Render
-        bird:render()
-
-        for k, pair in pairs(pipePairs) do -- Render every pipe in table
-            pair:render()
-        end
+        gStateMachine:render()
 
         -- Show FPS
         if fps then
@@ -167,7 +125,7 @@ function love.keyboard.wasPressed(key)
         return true
     else
         return false
-    end 
+    end
 end
 
 function love.resize(w, h)
