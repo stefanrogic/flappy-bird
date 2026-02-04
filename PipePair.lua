@@ -16,6 +16,7 @@ function PipePair:init(y)
 
     -- Is it ready to be removed from the scene (off the screen)
     self.remove = false
+    self.scored = false
 end
 
 function PipePair:update(dt)
