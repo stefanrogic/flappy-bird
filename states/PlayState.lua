@@ -85,7 +85,7 @@ function PlayState:render()
         pair:render()
     end
 
-    love.graphics.setFont(fonts['flappy'])
+    love.graphics.setFont(fonts['medium'])
     love.graphics.printf('Score: ' .. tostring(self.score), 8, 8,
         VIRTUAL_WIDTH, 'left')
 
