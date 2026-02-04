@@ -20,6 +20,20 @@ function Bird:render()
     love.graphics.draw(self.image, self.x, self.y)
 end
 
+function Bird:collides(pipe)
+    -- AABB collision detection
+    -- The 2's are left and top padding to make collision feel better
+    -- The 4's are right and bottom padding to make collision feel better
+    -- Both offsets are used to shrink the collision box to give a player some leeway
+    if (self.x + 2) + (self.width - 4) >= pipe.x and self.x + 2 <= pipe.x + PIPE_WIDTH then
+        if (self.y + 2) + (self.height - 4) >= pipe.y and self.y + 2 <= pipe.y + PIPE_HEIGHT then
+            return true
+        end
+    end
+
+    return false
+end
+
 function Bird:update(dt)
     self.dy = self.dy + GRAVITY * dt
 

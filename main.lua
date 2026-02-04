@@ -13,6 +13,8 @@ VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
 
 -- Scrolling
+local scrolling = true -- We need to pause scrolling to check colision
+
 local backgroundScroll = 0
 BACKGROUND_SCROLL_SPEED = 30
 BACKGROUND_LOOPING_POINT = 568
@@ -30,7 +32,7 @@ local lastY = -PIPE_HEIGHT + math.random(80) + 20
 
 -- Classes
 local bird
-local pipe
+-- local pipe
 local pipePair
 
 function love.load()
@@ -75,7 +77,7 @@ function love.load()
 
     -- Init objects
     bird = Bird(images['bird'], sounds['jump'])
-    pipe = Pipe(images['pipe'])
+    -- pipe = Pipe(images['pipe'])
     pipePair = PipePair(-PIPE_HEIGHT + math.random(80) + 20)
 
     -- FPS toggle
@@ -83,29 +85,39 @@ function love.load()
 end
 
 function love.update(dt)
-    -- Updates the background scroll position by incrementing it with a speed value scaled by delta time,
-    -- then wraps the scroll position back to the start using modulo operator when it exceeds the looping point.
-    -- This creates a seamless scrolling effect by cycling the background texture continuously.
-    backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
-    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
+    if scrolling then
+        -- Updates the background scroll position by incrementing it with a speed value scaled by delta time,
+        -- then wraps the scroll position back to the start using modulo operator when it exceeds the looping point.
+        -- This creates a seamless scrolling effect by cycling the background texture continuously.
+        backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
+        groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
 
-    -- Updates
-    bird:update(dt)
+        -- Updates
+        bird:update(dt)
 
-    spawnTimer = spawnTimer + dt
-    if spawnTimer > pipeDistance then
-        local y = math.max(-PIPE_HEIGHT + 50, 
-            math.min(lastY + math.random(-80, 80), VIRTUAL_HEIGHT - 50 - PIPE_HEIGHT)
-        )
+        spawnTimer = spawnTimer + dt
+        if spawnTimer > pipeDistance then
+            local y = math.max(-PIPE_HEIGHT + 50, 
+                math.min(lastY + math.random(-80, 80), VIRTUAL_HEIGHT - 50 - PIPE_HEIGHT)
+            )
 
-        lastY = y
+            lastY = y
 
-        table.insert(pipePairs, PipePair(y))
-        spawnTimer = 0
-    end
-    
-    for k, pair in pairs(pipePairs) do -- Update every pipe pair positions
-        pair:update(dt)
+            table.insert(pipePairs, PipePair(y))
+            spawnTimer = 0
+        end
+        
+        for k, pair in pairs(pipePairs) do -- Update every pipe pair positions
+            pair:update(dt)
+
+            for l, pipe in pairs(pair.pipes) do -- Check collision for every pipe in pair
+                if bird:collides(pipe) then
+                    sounds['explosion']:setVolume(0.2)
+                    sounds['explosion']:play()
+                    scrolling = false -- Pause the game to show collision
+                end
+            end
+        end    
     end
 
     -- Resets
