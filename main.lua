@@ -11,6 +11,7 @@ require 'states/BaseState'
 require 'states/TitleScreenState'
 require 'states/PlayState'
 require 'states/ScoreState'
+require 'states/CountdownState'
 
 -- Window constants
 WINDOW_WIDTH = 1280
@@ -70,7 +71,8 @@ function love.load()
     gStateMachine = StateMachine {
         ['title'] = function() return TitleScreenState() end,
         ['play'] = function() return PlayState() end,
-        ['score'] = function() return ScoreState() end
+        ['score'] = function() return ScoreState() end,
+        ['countdown'] = function() return CountdownState() end
     }
     gStateMachine:change('title')
 
@@ -79,14 +81,19 @@ function love.load()
 
     -- FPS toggle
     fps = false
+
+    -- Global scrolling flag
+    scrolling = true
 end
 
 function love.update(dt)
-    -- Updates the background scroll position by incrementing it with a speed value scaled by delta time,
-    -- then wraps the scroll position back to the start using modulo operator when it exceeds the looping point.
-    -- This creates a seamless scrolling effect by cycling the background texture continuously.
-    backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
-    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
+    if scrolling then
+        -- Updates the background scroll position by incrementing it with a speed value scaled by delta time,
+        -- then wraps the scroll position back to the start using modulo operator when it exceeds the looping point.
+        -- This creates a seamless scrolling effect by cycling the background texture continuously.
+        backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
+        groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
+    end
 
     gStateMachine:update(dt)
 

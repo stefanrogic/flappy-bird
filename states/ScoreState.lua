@@ -2,15 +2,27 @@ ScoreState = Class{__includes = BaseState}
 
 function ScoreState:enter(params)
     self.score = params.score
+    self.bird = params.bird
+    self.pipePairs = params.pipePairs
 end
 
 function ScoreState:update(dt)
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
-        gStateMachine:change('play')
+        scrolling = true
+        gStateMachine:change('countdown')
     end
 end
 
 function ScoreState:render()
+    -- Render frozen pipes
+    for k, pair in pairs(self.pipePairs) do
+        pair:render()
+    end
+
+    -- Render frozen bird
+    self.bird:render()
+
+    -- Render score overlay
     love.graphics.setFont(fonts['flappy'])
     love.graphics.printf(
         'Oof! You lost!', 
