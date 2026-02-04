@@ -62,17 +62,25 @@ function PlayState:update(dt)
             if self.bird:collides(pipe) then
                 sounds['explosion']:setVolume(0.2)
                 sounds['explosion']:play()
-                gStateMachine:change('score', { 
-                    score = self.score 
-                }) 
+                scrolling = false
+                gStateMachine:change('score', {
+                    score = self.score,
+                    bird = self.bird,
+                    pipePairs = self.pipePairs
+                })
             end
         end
     end
 
     if self.bird.y > VIRTUAL_HEIGHT - 15 then
-        gStateMachine:change('score', { 
-            score = self.score 
-        }) 
+        sounds['explosion']:setVolume(0.2)
+        sounds['explosion']:play()
+        scrolling = false
+        gStateMachine:change('score', {
+            score = self.score,
+            bird = self.bird,
+            pipePairs = self.pipePairs
+        })
     end
 
     -- Update bird based on gravity and input
