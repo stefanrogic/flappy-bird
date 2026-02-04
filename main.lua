@@ -78,6 +78,7 @@ function love.load()
 
     -- Input table (we need it for our own input handling)
     love.keyboard.keysPressed = {}
+    love.mouse.buttonsPressed = {}
 
     -- FPS toggle
     fps = false
@@ -99,6 +100,7 @@ function love.update(dt)
 
     -- Resets
     love.keyboard.keysPressed = {} -- Reset keys pressed table each frame
+    love.mouse.buttonsPressed = {} -- Reset mouse buttons pressed table each frame
 end
 
 function love.draw()
@@ -129,6 +131,18 @@ end
 
 function love.keyboard.wasPressed(key)
     if love.keyboard.keysPressed[key] then
+        return true
+    else
+        return false
+    end
+end
+
+function love.mousepressed(x, y, button)
+    love.mouse.buttonsPressed[button] = true
+end
+
+function love.mouse.wasPressed(button)
+    if love.mouse.buttonsPressed[button] then
         return true
     else
         return false
