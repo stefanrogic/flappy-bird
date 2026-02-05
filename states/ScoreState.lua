@@ -7,7 +7,7 @@ function ScoreState:enter(params)
 end
 
 function ScoreState:update(dt)
-    if love.keyboard.wasPressed('enter') or love.mouse.wasPressed(2) then
+    if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') or love.mouse.wasPressed(2) then
         scrolling = true
         gStateMachine:change('countdown')
     end
