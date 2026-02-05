@@ -72,7 +72,7 @@ function PlayState:update(dt)
         end
     end
 
-    if self.bird.y > VIRTUAL_HEIGHT - 15 then
+    if self.bird.y > VIRTUAL_HEIGHT - 40 then
         sounds['explosion']:setVolume(0.2)
         sounds['explosion']:play()
         scrolling = false
