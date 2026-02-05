@@ -39,9 +39,9 @@ function Bird:update(dt)
     self.dy = self.dy + GRAVITY * dt
     
     -- Tilt up when going up (negative dy), tilt down when falling (positive dy)
-    local tiltDegrees = self.dy * 5
-    tiltDegrees = math.max(-30, math.min(90, tiltDegrees))
-    self.angle = math.rad(tiltDegrees)
+    -- local tiltDegrees = self.dy * 5
+    -- tiltDegrees = math.max(-45, math.min(90, tiltDegrees))
+    -- self.angle = math.rad(tiltDegrees)
 
     if love.mouse.wasPressed(1) or love.keyboard.wasPressed('space') then
         self.dy = -3
