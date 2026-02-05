@@ -19,7 +19,7 @@ end
 
 function Bird:calculateTilt() -- Update tilt based on vertical falling speed
     local tiltDegrees = self.dy * 5
-    tiltDegrees = math.max(0, math.min(90, tiltDegrees))
+    tiltDegrees = math.min(90, tiltDegrees)
     self.angle = math.rad(tiltDegrees)
 end
 
@@ -45,7 +45,7 @@ function Bird:update(dt)
     self.dy = self.dy + GRAVITY * dt
     
 
-    self:calculateTilt()
+    -- self:calculateTilt()
 
     if love.mouse.wasPressed(1) or love.keyboard.wasPressed('space') then
         self.dy = -3
@@ -61,8 +61,7 @@ function Bird:fall(dt, groundY)
     self.dy = self.dy + GRAVITY * dt
     self.y = self.y + self.dy
     
-    -- Update tilt
-    self:calculateTilt()
+    -- self:calculateTilt()
     
     -- Stop at ground
     if self.y >= groundY then

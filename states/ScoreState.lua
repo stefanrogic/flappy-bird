@@ -5,7 +5,7 @@ function ScoreState:enter(params)
     self.bird = params.bird
     self.pipePairs = params.pipePairs
     self.birdLanded = false
-    self.groundY = VIRTUAL_HEIGHT - 40
+    self.groundY = VIRTUAL_HEIGHT - 35
 end
 
 function ScoreState:update(dt)
@@ -28,6 +28,7 @@ function ScoreState:render()
 
     -- Render frozen bird
     self.bird:render()
+    self.bird.angle = 0 -- Reset angle to avoid showing tilted bird on score screen
 
     -- Render score overlay
     love.graphics.setFont(fonts['flappy'])
