@@ -5,7 +5,7 @@ local GRAVITY = 20
 function Bird:init(img, sound)
     self.image = img
     self.sound = sound
-    self.sound:setVolume(0.1)
+    self.sound:setVolume(0.05)
 
     self.width = self.image:getWidth()
     self.height = self.image:getHeight()

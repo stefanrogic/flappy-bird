@@ -4,6 +4,9 @@ CountdownState = Class{__includes = BaseState}
 COUNTDOWN_TIME = 0.75
 
 function CountdownState:enter(params)
+    sounds['score']:setVolume(0.2)
+    sounds['score']:play()
+
     self.count = 3
     self.timer = 0
 end
@@ -12,6 +15,9 @@ function CountdownState:update(dt)
     self.timer = self.timer + dt
 
     if self.timer >= COUNTDOWN_TIME then
+        sounds['score']:setVolume(0.2)
+        sounds['score']:play()
+
         self.timer = self.timer % COUNTDOWN_TIME
         self.count = self.count - 1
 

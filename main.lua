@@ -38,9 +38,9 @@ function love.load()
     math.randomseed(os.time())
 
     fonts = {
-        ['small'] = love.graphics.newFont('fonts/font.ttf', 8),
-        ['medium'] = love.graphics.newFont('fonts/font.ttf', 14),
-        ['large'] = love.graphics.newFont('fonts/font.ttf', 28),
+        ['small'] = love.graphics.newFont('fonts/flappy.ttf', 8),
+        ['medium'] = love.graphics.newFont('fonts/flappy.ttf', 14),
+        ['large'] = love.graphics.newFont('fonts/flappy.ttf', 28),
         ['flappy'] = love.graphics.newFont('fonts/flappy.ttf', 56)
     }
     love.graphics.setFont(fonts['flappy'])
