@@ -24,7 +24,7 @@ function PlayState:update(dt)
     self.timer = self.timer + dt
 
     -- Spawn a new pipe pair every pipeDistance in seconds
-    if self.timer > pipeDistance then
+    if self.timer > pipeDistance or #self.pipePairs == 0 then
         -- Modify the lastY coordinate we placed so pipe gaps aren't too far apart
         local y = math.max(-PIPE_HEIGHT + 10,
             math.min(self.lastY + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
