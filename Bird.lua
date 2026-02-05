@@ -1,6 +1,6 @@
 Bird = Class{}
 
-local GRAVITY = 20
+local GRAVITY = 15
 
 function Bird:init(img, sound)
     self.image = img
@@ -14,10 +14,11 @@ function Bird:init(img, sound)
     self.y = VIRTUAL_HEIGHT / 2 - self.height / 2
 
     self.dy = 0
+    self.angle = 0
 end
 
 function Bird:render()
-    love.graphics.draw(self.image, self.x, self.y)
+    love.graphics.draw(self.image, self.x, self.y + self.height / 2, self.angle, 1, 1, 0, self.height / 2)
 end
 
 function Bird:collides(pipe)
@@ -36,6 +37,11 @@ end
 
 function Bird:update(dt)
     self.dy = self.dy + GRAVITY * dt
+    
+    -- Tilt up when going up (negative dy), tilt down when falling (positive dy)
+    local tiltDegrees = self.dy * 5
+    tiltDegrees = math.max(-30, math.min(90, tiltDegrees))
+    self.angle = math.rad(tiltDegrees)
 
     if love.mouse.wasPressed(1) or love.keyboard.wasPressed('space') then
         self.dy = -3
@@ -44,4 +50,20 @@ function Bird:update(dt)
     end
 
     self.y = self.y + self.dy
+end
+
+function Bird:fall(dt, groundY)
+    -- Apply gravity
+    self.dy = self.dy + GRAVITY * dt
+    self.y = self.y + self.dy
+    
+    -- Stop at ground
+    if self.y >= groundY then
+        self.y = groundY
+        self.dy = 0
+
+        return true
+    end
+    
+    return false
 end

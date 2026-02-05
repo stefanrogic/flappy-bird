@@ -51,6 +51,7 @@ function love.load()
         ['background'] = love.graphics.newImage('sprites/background.png'),
         ['ground'] = love.graphics.newImage('sprites/ground.png')
     }
+    images['bird']:setFilter('linear', 'linear')
 
     sounds = {
         ['jump'] = love.audio.newSource('sounds/jump.wav', 'static'),

@@ -72,6 +72,7 @@ function PlayState:update(dt)
         end
     end
 
+    -- Check for collision between bird and ground
     if self.bird.y > VIRTUAL_HEIGHT - 40 then
         sounds['explosion']:setVolume(0.2)
         sounds['explosion']:play()

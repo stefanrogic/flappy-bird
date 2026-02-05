@@ -4,9 +4,16 @@ function ScoreState:enter(params)
     self.score = params.score
     self.bird = params.bird
     self.pipePairs = params.pipePairs
+    self.birdLanded = false
+    self.groundY = VIRTUAL_HEIGHT - 40
 end
 
 function ScoreState:update(dt)
+    -- Animate bird falling to ground
+    if not self.birdLanded then
+        self.birdLanded = self.bird:fall(dt, self.groundY)
+    end
+
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') or love.mouse.wasPressed(2) then
         scrolling = true
         gStateMachine:change('countdown')
