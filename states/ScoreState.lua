@@ -7,7 +7,7 @@ function ScoreState:enter(params)
 end
 
 function ScoreState:update(dt)
-    if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
+    if love.keyboard.wasPressed('enter') or love.mouse.wasPressed(2) then
         scrolling = true
         gStateMachine:change('countdown')
     end
@@ -42,7 +42,7 @@ function ScoreState:render()
     )
 
     love.graphics.printf(
-        'Press Enter to Play Again!', 
+        'Press Enter or Right Click to Play Again!', 
         0, 
         VIRTUAL_HEIGHT / 2 + 20, 
         VIRTUAL_WIDTH, 
